@@ -11,12 +11,16 @@ class TemplateEngineTest : StringSpec({
             override fun visit(textNode: TextNode): String {
                 return textNode.text
             }
+
+            override fun visit(placeholderNode: PlaceholderNode): String {
+                return placeholderNode.placeholder
+            }
         }
 
     "processes template nodes correctly" {
         // Arrange
         val textNode1 = TextNode("Hello, ")
-        val textNode2 = TextNode("world!")
+        val textNode2 = PlaceholderNode("world!")
 
         // Act
         val result = engine.processTemplate(listOf(textNode1, textNode2), mockVisitor)

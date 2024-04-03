@@ -4,7 +4,7 @@ package uk.co.developmentanddinosaurs.diplodocs
  * Implements the Visitor interface to process template nodes.
  * This class defines the behavior for visiting each type of template node.
  */
-class TemplateProcessor : TemplateVisitor {
+class TemplateProcessor(private val data: Map<String, Any>) : TemplateVisitor {
     /**
      * Processes a text node.
      *
@@ -13,5 +13,27 @@ class TemplateProcessor : TemplateVisitor {
      */
     override fun visit(textNode: TextNode): String {
         return textNode.text
+    }
+
+    /**
+     * Processes a placeholder node.
+     *
+     * @param placeholderNode The placeholder node to process.
+     * @return The processed placeholder content.
+     */
+    override fun visit(placeholderNode: PlaceholderNode): String {
+        return resolvePlaceholderValue(placeholderNode.placeholder)
+    }
+
+    private fun resolvePlaceholderValue(placeholder: String): String {
+        val keys = placeholder.split('.')
+        var currentValue: Any? = data
+        for (key in keys) {
+            if (currentValue !is Map<*, *>) {
+                return ""
+            }
+            currentValue = currentValue[key]
+        }
+        return currentValue?.toString() ?: ""
     }
 }

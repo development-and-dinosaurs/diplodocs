@@ -29,3 +29,20 @@ data class TextNode(val text: String) : TemplateNode() {
         return visitor.visit(this)
     }
 }
+
+/**
+ * Represents a placeholder node in a template.
+ *
+ * Placeholder nodes contain a placeholder string that will be replaced with the appropriate value.
+ *
+ * @property placeholder The placeholder string.
+ */
+data class PlaceholderNode(val placeholder: String) : TemplateNode() {
+    /**
+     * Accepts the specified visitor and calls visit with itself.
+     * @param visitor The visitor to accept.
+     */
+    override fun accept(visitor: TemplateVisitor): String {
+        return visitor.visit(this)
+    }
+}
