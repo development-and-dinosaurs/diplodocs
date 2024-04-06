@@ -40,7 +40,6 @@ class TemplateParser {
     }
 
     private fun isValidPlaceholder(placeholder: String): Boolean {
-        println(placeholder)
         return placeholder.isNotEmpty() && placeholder.matches(Regex("\\w+(\\.\\w+)*"))
     }
 }
