@@ -6,7 +6,9 @@ package uk.co.developmentanddinosaurs.diplodocs
  * Analyzes the input text and generates template nodes based on its content and structure.
  */
 class TemplateParser {
-    private val pattern = Regex("\\{\\{\\s*(.*?)\\s*}}")
+    private val placeholderPattern = Regex("\\{\\{\\s*(.*?)\\s*}}")
+    private val loopStartPattern = Regex("\\{%\\s*for\\s+(\\w+)\\s+in\\s+(\\w+)\\s*%}")
+    private val loopEndPattern = Regex("\\{%\\s*endfor\\s*%}")
 
     /**
      * Parses the given template string and returns a list of template nodes.
@@ -15,10 +17,14 @@ class TemplateParser {
      * @return A list of template nodes representing the parsed template.
      */
     fun parse(template: String): List<TemplateNode> {
+        return parsePlaceholders(template)
+    }
+
+    private fun parsePlaceholders(template: String): MutableList<TemplateNode> {
         val nodes = mutableListOf<TemplateNode>()
         var lastIndex = 0
 
-        pattern.findAll(template).forEach { match ->
+        placeholderPattern.findAll(template).forEach { match ->
             val matchIndex = match.range.first
             if (matchIndex > lastIndex) {
                 // Add text node for text before placeholder
