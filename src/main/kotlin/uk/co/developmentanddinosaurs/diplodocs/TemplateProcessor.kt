@@ -22,18 +22,6 @@ class TemplateProcessor(private val data: Map<String, Any>) : TemplateVisitor {
      * @return The processed placeholder content.
      */
     override fun visit(placeholderNode: PlaceholderNode): String {
-        return resolvePlaceholderValue(placeholderNode.placeholder)
-    }
-
-    private fun resolvePlaceholderValue(placeholder: String): String {
-        val keys = placeholder.split('.')
-        var currentValue: Any? = data
-        for (key in keys) {
-            if (currentValue !is Map<*, *>) {
-                return ""
-            }
-            currentValue = currentValue[key]
-        }
-        return currentValue?.toString() ?: ""
+        return NestedKeyResolver.resolveNestedKey(placeholderNode.placeholder, data)
     }
 }
