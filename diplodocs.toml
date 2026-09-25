@@ -1,0 +1,21 @@
+[site]
+name = "Diplodocs"
+description = "High performance documentation built with Diplodocs"
+author = "Diplodocus"
+repo_url = "https://github.com/development-and-dinosaurs/diplodocs"
+version = "v0.1.0"
+edit_branch = "main"
+
+[theme]
+accent = "emerald"      # emerald, ocean, amber, rose, purple
+dark_mode = "auto"       # auto, light, dark
+logo_text = "🦕 Diplodocs"
+
+[features]
+search = true
+mermaid = true
+copy_button = true
+llms_txt = true
+repo_stats = true
+reading_time = true
+edit_link = true

@@ -1,0 +1,48 @@
+name: 'Diplodocs Documentation'
+description: 'Fast, opinionated documentation builder powered by Diplodocs 🦕'
+author: 'Development and Dinosaurs'
+branding:
+  icon: 'book-open'
+  color: 'green'
+
+inputs:
+  command:
+    description: 'Command to run (build, check, dev)'
+    required: false
+    default: 'build'
+  dir:
+    description: 'Project root directory containing docs/ and optional diplodocs.toml'
+    required: false
+    default: '.'
+  version:
+    description: 'Diplodocs version to use (default: action source / latest)'
+    required: false
+    default: 'latest'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v7
+      with:
+        go-version: 'stable'
+        cache: true
+
+    - name: Install Diplodocs
+      shell: bash
+      run: |
+        if command -v diplodocs &> /dev/null; then
+          echo "Diplodocs already available: $(diplodocs version)"
+          exit 0
+        fi
+
+        echo "🦕 Building Diplodocs binary from action source..."
+        cd "${{ github.action_path }}"
+        go build -o /usr/local/bin/diplodocs ./cmd/diplodocs
+        echo "✅ Diplodocs installed successfully: $(diplodocs version)"
+
+    - name: Run Diplodocs
+      shell: bash
+      run: |
+        echo "🦕 Running 'diplodocs ${{ inputs.command }}' on ${{ inputs.dir }}..."
+        diplodocs ${{ inputs.command }} --dir "${{ inputs.dir }}"
