@@ -11,6 +11,7 @@ permissions:
 jobs:
   build-release:
     name: 🦕 Build Binaries & Release
+    if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '.')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -63,10 +64,13 @@ jobs:
   publish-release:
     name: 🚀 Publish GitHub Release
     needs: build-release
+    if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '.')
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Download all built binaries
         uses: actions/download-artifact@v8
@@ -84,3 +88,18 @@ jobs:
         with:
           files: release-assets/*
           generate_release_notes: true
+
+      - name: Update Floating Major Version Tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            MAJOR_TAG="v${BASH_REMATCH[1]}"
+            echo "🦕 Updating floating major tag ${MAJOR_TAG} to point to ${TAG} (${GITHUB_SHA})..."
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -fa "${MAJOR_TAG}" "${GITHUB_SHA}" -m "Release ${MAJOR_TAG} (${TAG})"
+            git push origin "${MAJOR_TAG}" --force
+            echo "✅ Floating major tag ${MAJOR_TAG} updated successfully."
+          else
+            echo "ℹ️ Tag ${TAG} is not a full semver release (vX.Y.Z); skipping major tag update."
+          fi
