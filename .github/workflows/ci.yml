@@ -1,0 +1,38 @@
+name: 🦕 CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: 🦕 Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache: true
+
+      - name: Run Tests
+        run: go test -v ./...
+
+      - name: Run Vet
+        run: go vet ./...
+
+      - name: Build Diplodocs Binary
+        run: go build -o diplodocs ./cmd/diplodocs
+
+      - name: Test Diplodocs Self-Documentation Build
+        run: ./diplodocs build
+
+      - name: Verify Link Integrity
+        run: ./diplodocs check
