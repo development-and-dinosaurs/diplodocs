@@ -10,8 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ParseMkDocsNav transforms arbitrary MkDocs YAML navigation structures into NavItemConfig.
-func ParseMkDocsNav(items []interface{}) []navigation.NavItemConfig {
+// ParseLegacyNav transforms legacy YAML navigation structures into NavItemConfig.
+func ParseLegacyNav(items []interface{}) []navigation.NavItemConfig {
 	var result []navigation.NavItemConfig
 	for _, it := range items {
 		switch v := it.(type) {
@@ -31,7 +31,7 @@ func ParseMkDocsNav(items []interface{}) []navigation.NavItemConfig {
 						Path:  target,
 					})
 				case []interface{}:
-					children := ParseMkDocsNav(target)
+					children := ParseLegacyNav(target)
 					result = append(result, navigation.NavItemConfig{
 						Title:    title,
 						Children: children,
@@ -48,7 +48,7 @@ func ParseMkDocsNav(items []interface{}) []navigation.NavItemConfig {
 						Path:  target,
 					})
 				case []interface{}:
-					children := ParseMkDocsNav(target)
+					children := ParseLegacyNav(target)
 					result = append(result, navigation.NavItemConfig{
 						Title:    title,
 						Children: children,
@@ -60,19 +60,20 @@ func ParseMkDocsNav(items []interface{}) []navigation.NavItemConfig {
 	return result
 }
 
-// LoadFromMkDocs parses mkdocs.yml and constructs a Config struct.
-func LoadFromMkDocs(mkdocsPath string) (*Config, error) {
-	data, err := os.ReadFile(mkdocsPath)
+
+// LoadFromLegacyYAML parses legacy YAML configuration and constructs a Config struct.
+func LoadFromLegacyYAML(configPath string) (*Config, error) {
+	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("reading %s: %w", mkdocsPath, err)
+		return nil, fmt.Errorf("reading %s: %w", configPath, err)
 	}
 
 	var raw map[string]interface{}
 	if err := yaml.Unmarshal(data, &raw); err != nil {
-		return nil, fmt.Errorf("parsing YAML in %s: %w", mkdocsPath, err)
+		return nil, fmt.Errorf("parsing YAML in %s: %w", configPath, err)
 	}
 
-	dirName := filepath.Dir(mkdocsPath)
+	dirName := filepath.Dir(configPath)
 	cfg := DefaultConfig(dirName)
 
 	if name, ok := raw["site_name"].(string); ok && name != "" {
@@ -115,11 +116,12 @@ func LoadFromMkDocs(mkdocsPath string) (*Config, error) {
 
 	// Navigation
 	if navList, ok := raw["nav"].([]interface{}); ok {
-		cfg.Nav = ParseMkDocsNav(navList)
+		cfg.Nav = ParseLegacyNav(navList)
 	}
 
 	return cfg, nil
 }
+
 
 // ExportTOML marshals a Config into formatted TOML bytes.
 func ExportTOML(cfg *Config) ([]byte, error) {

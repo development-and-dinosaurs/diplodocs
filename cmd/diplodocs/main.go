@@ -39,7 +39,7 @@ Commands:
   dev            Start local development server with instant live reload
   build          Compile documentation into high performance static HTML
   check          Scan documentation for broken internal links and images
-  migrate [dir]  Convert an existing MkDocs project (mkdocs.yml) to Diplodocs
+  migrate [dir]  Convert legacy documentation projects to Diplodocs
   version        Print Diplodocs version
 
 Flags for 'dev':
@@ -53,7 +53,7 @@ Flags for 'check':
   --dir <string> Root project directory (default: current dir)
 
 Flags for 'migrate':
-  --dir <string> Root project directory containing mkdocs.yml (default: current dir)
+  --dir <string> Root project directory containing legacy config (default: current dir)
 
 Examples:
   diplodocs new my-docs
@@ -182,7 +182,7 @@ func runCheck(args []string) {
 
 func runMigrate(args []string) {
 	migrateCmd := flag.NewFlagSet("migrate", flag.ExitOnError)
-	dir := migrateCmd.String("dir", ".", "Project root directory containing mkdocs.yml")
+	dir := migrateCmd.String("dir", ".", "Project root directory containing legacy config")
 	_ = migrateCmd.Parse(args)
 
 	targetDir := *dir
@@ -190,7 +190,7 @@ func runMigrate(args []string) {
 		targetDir = migrateCmd.Args()[0]
 	}
 
-	fmt.Printf("🦕 Searching for MkDocs configuration in '%s'...\n", targetDir)
+	fmt.Printf("🦕 Searching for legacy documentation configuration in '%s'...\n", targetDir)
 	var mkPath string
 	for _, name := range []string{"mkdocs.yml", "mkdocs.yaml"} {
 		p := filepath.Join(targetDir, name)
@@ -200,11 +200,11 @@ func runMigrate(args []string) {
 		}
 	}
 	if mkPath == "" {
-		fmt.Fprintf(os.Stderr, "❌ No mkdocs.yml or mkdocs.yaml found in '%s'\n", targetDir)
+		fmt.Fprintf(os.Stderr, "❌ No legacy configuration file found in '%s'\n", targetDir)
 		os.Exit(1)
 	}
 
-	cfg, err := config.LoadFromMkDocs(mkPath)
+	cfg, err := config.LoadFromLegacyYAML(mkPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Failed to parse %s: %v\n", mkPath, err)
 		os.Exit(1)

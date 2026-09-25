@@ -11,7 +11,7 @@ inputs:
     required: false
     default: 'build'
   dir:
-    description: 'Project root directory containing diplodocs.toml or mkdocs.yml'
+    description: 'Project root directory containing docs/ and optional diplodocs.toml'
     required: false
     default: '.'
   version:

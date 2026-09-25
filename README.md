@@ -2,23 +2,23 @@
 
 > **Colossal documentation with a long reach — zero configuration, modern batteries included.**
 
-Diplodocs is a blazingly fast documentation engine written in Go, crafted as a sleek, opinionated alternative to MkDocs.
+Diplodocs is a blazingly fast documentation engine written in pure Go. It gives you modern, responsive documentation sites in milliseconds with zero dependencies.
 
-While MkDocs requires 5–10 third-party plugins (`pymdown-extensions`, `mkdocs-material`, `mkdocs-awesome-pages`) and 60+ lines of nested YAML configuration just to get standard modern features, Diplodocs is **batteries-included and zero-config by default**.
+While some documentation engines require juggling Python runtimes, pip dependencies, virtualenv setups, and 60+ lines of fragile YAML configuration just to get standard features like code tabs and callouts, Diplodocs is **batteries-included and zero-config by default**.
 
 ---
 
 ## 🌟 The Diplodocs USP
 
-| Feature | MkDocs Vanilla | MkDocs + Material | **🦕 Diplodocs** |
+| Feature | Traditional Python Engines | Plugin-Heavy Setup | **🦕 Diplodocs** |
 | :--- | :---: | :---: | :---: |
-| **Setup & Dependencies** | Python + pip | 10+ pip packages | **1 static Go binary (zero deps)** |
+| **Setup & Dependencies** | Python + pip | 10+ pip packages + virtualenvs | **1 static Go binary (zero dependencies)** |
 | **Config Required** | YAML boilerplate | 50+ lines YAML | **Zero-config (runs out of the box)** |
-| **Admonitions / Callouts**| ❌ | ⚠️ (Requires PyMdown) | **✅ Native GitHub & Material syntax** |
-| **Code Tabs & Copy** | ❌ | ⚠️ (Requires PyMdown) | **✅ Native** |
-| **Mermaid Diagrams** | ❌ | ⚠️ (Requires JS config) | **✅ Native client-side rendering** |
+| **Admonitions / Callouts**| ❌ | ⚠️ (Requires plugin ecosystem) | **✅ Native GitHub & 3-bang syntax** |
+| **Code Tabs & Copy** | ❌ | ⚠️ (Requires plugins) | **✅ Native** |
+| **Mermaid Diagrams** | ❌ | ⚠️ (Requires custom scripts) | **✅ Native client-side rendering** |
 | **Filesystem Auto-Nav** | ❌ (Manual `nav:`) | ❌ (Needs extra plugin)| **✅ Automatic with prefix cleanup** |
-| **Instant Client Search**| Basic Lunr | Worker/Lunr | **✅ Fast fuzzy modal search (Ctrl+K)** |
+| **Instant Client Search**| Basic Lunr | Heavy JS worker | **✅ Fast fuzzy modal search (Ctrl+K)** |
 | **GitHub Stars & Forks** | ❌ | Requires plugin/theme | **✅ Native cached GitHub card** |
 | **Version Badge** | ❌ | Requires theme config | **✅ Native `version = "v..."`** |
 | **"Edit this page" Link** | ❌ | Requires manual URI setup | **✅ Auto-computed GitHub edit links** |
@@ -32,7 +32,7 @@ While MkDocs requires 5–10 third-party plugins (`pymdown-extensions`, `mkdocs-
 
 ### 1. Build and Install
 ```bash
-git clone https://github.com/diplodocs/diplodocs.git
+git clone https://github.com/development-and-dinosaurs/diplodocs.git
 cd diplodocs
 go build -o diplodocs ./cmd/diplodocs
 ```

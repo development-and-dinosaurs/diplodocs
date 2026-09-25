@@ -104,11 +104,11 @@ func LoadConfig(projectRoot string) (*Config, error) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// Check if mkdocs.yml or mkdocs.yaml exists
-			for _, mk := range []string{"mkdocs.yml", "mkdocs.yaml"} {
-				mkPath := filepath.Join(projectRoot, mk)
-				if _, err := os.Stat(mkPath); err == nil {
-					return LoadFromMkDocs(mkPath)
+			// Fallback: check if legacy YAML config exists
+			for _, legacy := range []string{"mkdocs.yml", "mkdocs.yaml"} {
+				legacyPath := filepath.Join(projectRoot, legacy)
+				if _, err := os.Stat(legacyPath); err == nil {
+					return LoadFromLegacyYAML(legacyPath)
 				}
 			}
 			// Zero-config mode: return defaults
