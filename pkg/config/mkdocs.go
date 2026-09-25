@@ -7,7 +7,7 @@ import (
 
 	"github.com/development-and-dinosaurs/diplodocs/pkg/navigation"
 	"github.com/pelletier/go-toml/v2"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // ParseMkDocsNav transforms arbitrary MkDocs YAML navigation structures into NavItemConfig.
@@ -21,6 +21,23 @@ func ParseMkDocsNav(items []interface{}) []navigation.NavItemConfig {
 				Title: clean,
 				Path:  v,
 			})
+		case map[string]interface{}:
+			for key, val := range v {
+				title := key
+				switch target := val.(type) {
+				case string:
+					result = append(result, navigation.NavItemConfig{
+						Title: title,
+						Path:  target,
+					})
+				case []interface{}:
+					children := ParseMkDocsNav(target)
+					result = append(result, navigation.NavItemConfig{
+						Title:    title,
+						Children: children,
+					})
+				}
+			}
 		case map[interface{}]interface{}:
 			for key, val := range v {
 				title := fmt.Sprint(key)

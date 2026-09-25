@@ -6,7 +6,7 @@ Diplodocs is distributed as a single static binary. You don't need Python or Nod
 
 ```bash
 # Download and install diplodocs binary
-go install diplodocs/cmd/diplodocs@latest
+go install github.com/development-and-dinosaurs/diplodocs/cmd/diplodocs@latest
 ```
 
 ## Verify Installation

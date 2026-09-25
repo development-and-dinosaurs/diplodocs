@@ -2,7 +2,7 @@
 name = "Diplodocs"
 description = "High performance documentation built with Diplodocs"
 author = "Diplodocus"
-repo_url = "https://github.com/diplodocs/diplodocs"
+repo_url = "https://github.com/development-and-dinosaurs/diplodocs"
 version = "v0.1.0"
 edit_branch = "main"
 
