@@ -18,6 +18,9 @@ var (
 
 	// Matches ![Alt](src){ .class }
 	imgAttrRegex = regexp.MustCompile(`!\[([^\]]*)\]\(([^)]+)\)\{\s*\.([a-zA-Z0-9_-]+)\s*\}`)
+
+	// Matches raw HTML <a href="..."> tags
+	rawHTMLLinkRegex = regexp.MustCompile(`(?i)(<a\s+[^>]*href=["'])([^"']+)(["'][^>]*>)`)
 )
 
 type calloutMeta struct {
@@ -76,6 +79,13 @@ func getCalloutMeta(rawType string, customTitle string) calloutMeta {
 // PreprocessMarkdown handles GitHub Callouts, Material Admonitions, and Code Tabs.
 func PreprocessMarkdown(content string) string {
 	content = imgAttrRegex.ReplaceAllString(content, `<img src="$2" alt="$1" class="$3">`)
+	content = rawHTMLLinkRegex.ReplaceAllStringFunc(content, func(m string) string {
+		sub := rawHTMLLinkRegex.FindStringSubmatch(m)
+		if len(sub) == 4 {
+			return sub[1] + RewriteMarkdownLink(sub[2]) + sub[3]
+		}
+		return m
+	})
 	lines := strings.Split(content, "\n")
 	var result []string
 	n := len(lines)

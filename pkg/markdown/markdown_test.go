@@ -83,3 +83,54 @@ Here is how you start.
 		t.Errorf("expected clean plain text, got:\n%s", res.PlainTxt)
 	}
 }
+
+func TestRewriteMarkdownLink(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"quick-start.md", "quick-start.html"},
+		{"quick-start.markdown", "quick-start.html"},
+		{"quick-start.md#usage", "quick-start.html#usage"},
+		{"./cli.md?v=2#flags", "./cli.html?v=2#flags"},
+		{"../guides/diagrams.md", "../guides/diagrams.html"},
+		{"index.md", "index.html"},
+		{"https://github.com/foo/bar.md", "https://github.com/foo/bar.md"},
+		{"http://example.com/test.md#anchor", "http://example.com/test.md#anchor"},
+		{"mailto:user@domain.md", "mailto:user@domain.md"},
+		{"#heading-only", "#heading-only"},
+		{"image.png", "image.png"},
+		{"archive.tar.gz", "archive.tar.gz"},
+	}
+
+	for _, tt := range tests {
+		got := RewriteMarkdownLink(tt.input)
+		if got != tt.expected {
+			t.Errorf("RewriteMarkdownLink(%q) = %q; want %q", tt.input, got, tt.expected)
+		}
+	}
+}
+
+func TestMarkdownLinkRewritingEndToEnd(t *testing.T) {
+	engine := NewEngine()
+	src := `Check out the [Gradle Plugin](gradle-plugin.md), the [CLI Guide](cli.md#flags), or [External](https://example.com/doc.md).
+Also raw HTML: <a href="library.md#api">Library API</a>.`
+
+	res, err := engine.Render([]byte(src), "Links")
+	if err != nil {
+		t.Fatalf("render failed: %v", err)
+	}
+
+	if !strings.Contains(res.HTML, `href="gradle-plugin.html"`) {
+		t.Errorf("expected gradle-plugin.html in HTML, got:\n%s", res.HTML)
+	}
+	if !strings.Contains(res.HTML, `href="cli.html#flags"`) {
+		t.Errorf("expected cli.html#flags in HTML, got:\n%s", res.HTML)
+	}
+	if !strings.Contains(res.HTML, `href="https://example.com/doc.md"`) {
+		t.Errorf("expected untouched external link in HTML, got:\n%s", res.HTML)
+	}
+	if !strings.Contains(res.HTML, `href="library.html#api"`) {
+		t.Errorf("expected raw HTML rewritten to library.html#api, got:\n%s", res.HTML)
+	}
+}
