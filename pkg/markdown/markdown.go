@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -170,6 +171,10 @@ func (e *Engine) Render(raw []byte, defaultTitle string) (*RenderResult, error) 
 			return ast.WalkContinue, nil
 		}
 
+		if link, ok := n.(*ast.Link); ok {
+			link.Destination = []byte(RewriteMarkdownLink(string(link.Destination)))
+		}
+
 		if heading, ok := n.(*ast.Heading); ok {
 			var textBuf bytes.Buffer
 			for child := heading.FirstChild(); child != nil; child = child.NextSibling() {
@@ -251,4 +256,41 @@ func slugify(s string) string {
 	s = nonWordRegex.ReplaceAllString(s, "")
 	s = whitespaceRegex.ReplaceAllString(s, "-")
 	return strings.Trim(s, "-")
+}
+
+// RewriteMarkdownLink transforms relative .md / .markdown links to .html for browser navigation.
+func RewriteMarkdownLink(dest string) string {
+	// Skip external links, schemes, mailto, and pure in-page anchors
+	if strings.Contains(dest, "://") ||
+		strings.HasPrefix(dest, "mailto:") ||
+		strings.HasPrefix(dest, "tel:") ||
+		strings.HasPrefix(dest, "javascript:") ||
+		strings.HasPrefix(dest, "#") {
+		return dest
+	}
+
+	// Separate anchor / hash fragment (e.g. page.md#section)
+	parts := strings.SplitN(dest, "#", 2)
+	targetAndQuery := parts[0]
+	hash := ""
+	if len(parts) == 2 {
+		hash = "#" + parts[1]
+	}
+
+	// Separate query params (e.g. page.md?v=1)
+	qParts := strings.SplitN(targetAndQuery, "?", 2)
+	target := qParts[0]
+	query := ""
+	if len(qParts) == 2 {
+		query = "?" + qParts[1]
+	}
+
+	// Check if target ends with .md or .markdown
+	ext := strings.ToLower(filepath.Ext(target))
+	if ext == ".md" || ext == ".markdown" {
+		target = strings.TrimSuffix(target, ext) + ".html"
+		return target + query + hash
+	}
+
+	return dest
 }
